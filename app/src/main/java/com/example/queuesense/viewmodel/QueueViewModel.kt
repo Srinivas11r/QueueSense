@@ -1,5 +1,6 @@
 package com.example.queuesense.viewmodel
 
+import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.queuesense.data.model.QueueLocation
@@ -52,8 +53,6 @@ class QueueViewModel(
     private fun observeAuthState() {
         auth.addAuthStateListener { firebaseAuth ->
             _currentUser.value = firebaseAuth.currentUser
-            // In a real app, we would fetch the user profile from Firestore here
-            // For now, we update the local state
         }
     }
 
@@ -61,7 +60,8 @@ class QueueViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             repository.getLocations().collect { list ->
-                _locations.value = if (list.isEmpty()) getSampleData() else list
+                val data = if (list.isEmpty()) getSampleData() else list
+                _locations.value = calculateDistances(data, _userLocation.value)
                 _isLoading.value = false
             }
         }
@@ -69,7 +69,22 @@ class QueueViewModel(
 
     fun setUserLocation(latLng: LatLng) {
         _userLocation.value = latLng
-        // Distance calculation could be moved to the Repository or a UseCase in a larger project
+        _locations.value = calculateDistances(_locations.value, latLng)
+    }
+
+    private fun calculateDistances(locations: List<QueueLocation>, userLoc: LatLng?): List<QueueLocation> {
+        if (userLoc == null) return locations
+        
+        return locations.map { loc ->
+            val results = FloatArray(1)
+            Location.distanceBetween(
+                userLoc.latitude, userLoc.longitude,
+                loc.latitude, loc.longitude,
+                results
+            )
+            val distanceInKm = results[0] / 1000.0
+            loc.copy(distance = Math.round(distanceInKm * 10.0) / 10.0)
+        }.sortedBy { it.distance }
     }
 
     fun fetchReviews(locationId: String) {
@@ -95,7 +110,6 @@ class QueueViewModel(
             try {
                 repository.addReview(review)
             } catch (e: Exception) {
-                // Handle error (e.g., show a Snackbar via a UI effect flow)
             }
         }
     }
@@ -108,7 +122,7 @@ class QueueViewModel(
         return listOf(
             QueueLocation("1", "RTO Office", "Anantapur", "Govt", "Long", "45 mins", 50, "2 PM", 14.6819, 77.6006),
             QueueLocation("2", "Apollo Hospital", "Bangalore", "Health", "Moderate", "20 mins", 15, "10 AM", 12.9716, 77.5946),
-            QueueLocation("3", "Axis Bank", "Anantapur", "Banks", "Short", "10 mins", 5, "11 AM", 14.6819, 77.6006)
+            QueueLocation("3", "Axis Bank", "Anantapur", "Banks", "Short", "10 mins", 5, "11 AM", 14.6548, 77.5562)
         )
     }
 }
