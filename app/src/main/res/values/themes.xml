@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.QueueSense" parent="Theme.Material3.DayNight.NoActionBar" />
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar" />
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.Material3.DayNight.NoActionBar" />
+</resources>
