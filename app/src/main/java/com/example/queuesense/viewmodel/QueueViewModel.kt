@@ -14,10 +14,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import com.example.queuesense.data.source.sampleLocations
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.*
@@ -185,27 +183,13 @@ class QueueViewModel(
     fun seedDatabase() {
         viewModelScope.launch {
             val db = FirebaseFirestore.getInstance()
-            val locations = listOf(
-                QueueLocation("101", "Kadiri RTO", "Kadiri", "Govt", "Moderate", "30 mins", 25, "10 AM", 14.1147, 78.1598),
-                QueueLocation("102", "Kadiri Govt Hospital", "Kadiri", "Health", "Long", "1 hour", 60, "9 AM", 14.1200, 78.1650),
-                QueueLocation("103", "SBI Kadiri", "Kadiri", "Banks", "Short", "5 mins", 4, "4 PM", 14.1100, 78.1500),
-                QueueLocation("104", "RTC Bus Stand", "Kadiri", "Govt", "Very Long", "45 mins", 100, "6 PM", 14.1180, 78.1620),
-                QueueLocation("105", "D-Mart", "Anantapur", "Stores", "Moderate", "20 mins", 40, "11 AM", 14.6819, 77.6006),
-                QueueLocation("106", "HDFC Bank", "Anantapur", "Banks", "Short", "10 mins", 8, "10 AM", 14.6850, 77.6100),
-                QueueLocation("107", "KIMS Hospital", "Anantapur", "Health", "Moderate", "25 mins", 30, "2 PM", 14.6700, 77.5900)
-            )
-            
-            for (loc in locations) {
+            for (loc in sampleLocations) {
                 db.collection("locations").document(loc.id).set(loc).await()
             }
         }
     }
 
     private fun getSampleData(): List<QueueLocation> {
-        return listOf(
-            QueueLocation("1", "RTO Office", "Anantapur", "Govt", "Long", "45 mins", 50, "2 PM", 14.6819, 77.6006),
-            QueueLocation("2", "Apollo Hospital", "Bangalore", "Health", "Moderate", "20 mins", 15, "10 AM", 12.9716, 77.5946),
-            QueueLocation("3", "Axis Bank", "Anantapur", "Banks", "Short", "10 mins", 5, "11 AM", 14.6548, 77.5562)
-        )
+        return sampleLocations
     }
 }

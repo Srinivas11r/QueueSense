@@ -17,9 +17,14 @@ class LocationRepositoryImpl(
 
     override fun getLocations(): Flow<List<QueueLocation>> = callbackFlow {
         val subscription = firestore.collection("locations")
-            .addSnapshotListener { snapshot, _ ->
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    return@addSnapshotListener
+                }
                 if (snapshot != null) {
-                    val locations = snapshot.toObjects(QueueLocation::class.java)
+                    val locations = snapshot.documents.mapNotNull { doc ->
+                        doc.toObject(QueueLocation::class.java)?.copy(id = doc.id)
+                    }
                     trySend(locations)
                 }
             }
@@ -30,9 +35,25 @@ class LocationRepositoryImpl(
         val subscription = firestore.collection("reviews")
             .whereEqualTo("locationId", locationId)
             .orderBy("createdAt", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, _ ->
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    // Fallback without ordering if index is missing
+                    firestore.collection("reviews")
+                        .whereEqualTo("locationId", locationId)
+                        .addSnapshotListener { snap, err ->
+                            if (snap != null) {
+                                val reviews = snap.documents.mapNotNull { doc ->
+                                    doc.toObject(Review::class.java)?.copy(id = doc.id)
+                                }.sortedByDescending { it.createdAt }
+                                trySend(reviews)
+                            }
+                        }
+                    return@addSnapshotListener
+                }
                 if (snapshot != null) {
-                    val reviews = snapshot.toObjects(Review::class.java)
+                    val reviews = snapshot.documents.mapNotNull { doc ->
+                        doc.toObject(Review::class.java)?.copy(id = doc.id)
+                    }
                     trySend(reviews)
                 }
             }

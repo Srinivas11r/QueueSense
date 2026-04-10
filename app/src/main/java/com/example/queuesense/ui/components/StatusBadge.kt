@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.queuesense.data.model.OperationalStatus
 
 @Composable
 fun StatusBadge(status: String) {
@@ -26,5 +27,17 @@ fun StatusBadge(status: String) {
         modifier = Modifier
             .background(badgeColor, RoundedCornerShape(8.dp))
             .padding(horizontal = 10.dp, vertical = 6.dp)
+    )
+}
+
+@Composable
+fun OperationalStatusBadge(status: OperationalStatus) {
+    Text(
+        text = status.label,
+        color = Color.White,
+        style = MaterialTheme.typography.labelSmall,
+        modifier = Modifier
+            .background(Color(status.colorHex), RoundedCornerShape(4.dp))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     )
 }

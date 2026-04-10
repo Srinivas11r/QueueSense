@@ -23,7 +23,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.queuesense.data.model.OperationalStatus
 import com.example.queuesense.data.model.Review
+import com.example.queuesense.ui.components.OperationalStatusBadge
 import com.example.queuesense.ui.components.StatusBadge
 import com.example.queuesense.viewmodel.QueueViewModel
 
@@ -86,7 +88,12 @@ fun LocationDetailsScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(location.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                                Text(location.category, color = Color.Gray, fontSize = 16.sp)
+                                Text(location.city, color = Color.Gray, fontSize = 16.sp)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(location.category, color = Color.Gray, fontSize = 14.sp)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    OperationalStatusBadge(location.getOperationalStatus())
+                                }
                             }
                             StatusBadge(location.status)
                         }
@@ -96,7 +103,17 @@ fun LocationDetailsScreen(
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             DetailInfoItem(Icons.Default.Timer, "Wait Time", location.waitTime)
                             DetailInfoItem(Icons.Default.People, "People", "${location.peopleCount}")
-                            DetailInfoItem(Icons.Default.Schedule, "Best Time", location.bestTime)
+                            DetailInfoItem(Icons.Default.Schedule, "Hours", "${location.openTime} - ${location.closeTime}")
+                        }
+                        
+                        if (location.getOperationalStatus() == OperationalStatus.ON_BREAK) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                "Note: Staff is currently on Lunch Break (${location.breakStart} - ${location.breakEnd})",
+                                color = Color(0xFFFF9800),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }

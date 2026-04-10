@@ -88,6 +88,7 @@ fun QueueCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 StatusBadge(location.status)
+                OperationalStatusBadge(location.getOperationalStatus())
                 Text(
                     text = "• Est. ${location.waitTime}",
                     fontSize = 14.sp,
