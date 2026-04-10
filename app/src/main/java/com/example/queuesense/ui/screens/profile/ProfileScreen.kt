@@ -23,7 +23,13 @@ import coil.compose.AsyncImage
 import com.example.queuesense.viewmodel.QueueViewModel
 
 @Composable
-fun ProfileScreen(viewModel: QueueViewModel) {
+fun ProfileScreen(
+    viewModel: QueueViewModel,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToHistory: () -> Unit,
+    onNavigateToNotifications: () -> Unit,
+    onNavigateToHelp: () -> Unit
+) {
     val userProfile by viewModel.userProfile.collectAsState()
     val currentUser by viewModel.currentUser.collectAsState()
 
@@ -82,10 +88,10 @@ fun ProfileScreen(viewModel: QueueViewModel) {
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
             
-            ProfileOptionItem(Icons.Default.Person, "Edit Profile") {}
-            ProfileOptionItem(Icons.Default.Notifications, "Notifications") {}
-            ProfileOptionItem(Icons.Default.History, "My Queue History") {}
-            ProfileOptionItem(Icons.AutoMirrored.Filled.Help, "Help & Support") {}
+            ProfileOptionItem(Icons.Default.Person, "Edit Profile") { onNavigateToEditProfile() }
+            ProfileOptionItem(Icons.Default.Notifications, "Notifications") { onNavigateToNotifications() }
+            ProfileOptionItem(Icons.Default.History, "My Queue History") { onNavigateToHistory() }
+            ProfileOptionItem(Icons.AutoMirrored.Filled.Help, "Help & Support") { onNavigateToHelp() }
             
             Spacer(modifier = Modifier.height(24.dp))
 

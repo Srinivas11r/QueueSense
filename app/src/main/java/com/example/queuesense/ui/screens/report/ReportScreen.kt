@@ -33,7 +33,7 @@ fun ReportScreen(
 
     var selectedLevel by remember { mutableStateOf<String?>(null) }
     var estimatedWaitTime by remember { mutableStateOf("") }
-    var additionalNotes by remember { mutableStateOf("") }
+    var peopleCount by remember { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
 
     val crowdLevels = listOf(
@@ -87,7 +87,7 @@ fun ReportScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text("Estimated Wait Time (Optional)", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Text("Estimated Wait Time", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = estimatedWaitTime,
@@ -100,14 +100,13 @@ fun ReportScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text("Additional Notes", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Text("Approx. People Count", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = additionalNotes,
-                onValueChange = { additionalNotes = it },
+                value = peopleCount,
+                onValueChange = { if (it.all { char -> char.isDigit() }) peopleCount = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Describe the situation...") },
-                minLines = 3,
+                placeholder = { Text("e.g. 25") },
                 shape = RoundedCornerShape(12.dp)
             )
 
@@ -116,8 +115,12 @@ fun ReportScreen(
             Button(
                 onClick = {
                     isSubmitting = true
-                    // In a real app, call viewModel.submitReport(...)
-                    // For now, we simulate a delay
+                    viewModel.submitReport(
+                        locationId = locationId,
+                        status = selectedLevel ?: "Moderate",
+                        waitTime = if (estimatedWaitTime.isEmpty()) "Unknown" else estimatedWaitTime,
+                        peopleCount = peopleCount.toIntOrNull() ?: 0
+                    )
                     onBack()
                 },
                 modifier = Modifier
@@ -132,15 +135,6 @@ fun ReportScreen(
                     Text("Submit Real-time Report", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Your reports are anonymous and help the community stay informed.",
-                fontSize = 12.sp,
-                color = Color.Gray,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
         }
     }
 }

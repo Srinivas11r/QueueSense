@@ -1,16 +1,26 @@
 package com.example.queuesense.ui.navigation
 
 sealed class Screen(val route: String) {
+    // Auth Screens
+    object Login : Screen("login")
+    object Signup : Screen("signup")
+    
+    // Main Screens
     object Home : Screen("home")
-    object Explore : Screen("explore")
     object Forecast : Screen("forecast")
+    object Profile : Screen("profile")
+    
+    // Detail Screens
     object Details : Screen("details/{locationId}") {
         fun createRoute(locationId: String) = "details/$locationId"
     }
     object Report : Screen("report/{locationId}") {
         fun createRoute(locationId: String) = "report/$locationId"
     }
-    object Cinema : Screen("cinema")
-    object Profile : Screen("profile")
-    object Settings : Screen("settings")
+    
+    // Additional Profile Screens
+    object EditProfile : Screen("edit_profile")
+    object Notifications : Screen("notifications")
+    object History : Screen("history")
+    object Help : Screen("help")
 }

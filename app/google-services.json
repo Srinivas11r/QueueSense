@@ -1,26 +1,36 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "project_id": "queuesense-placeholder",
-    "storage_bucket": "queuesense-placeholder.appspot.com"
+    "project_number": "264231367217",
+    "project_id": "queuesense-c90a4",
+    "storage_bucket": "queuesense-c90a4.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:264231367217:android:1366fceb39e4b542be1b10",
         "android_client_info": {
           "package_name": "com.example.queuesense"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "264231367217-d1pbjl8sgm1uk6bf0luobolght1et911.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "placeholder-api-key"
+          "current_key": "AIzaSyCevtJ_f91Xplcqkac64s1wvH-DBHKEdhc"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "264231367217-d1pbjl8sgm1uk6bf0luobolght1et911.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -19,6 +19,7 @@ import com.example.queuesense.data.model.QueueLocation
 import com.example.queuesense.viewmodel.QueueViewModel
 import com.example.queuesense.ui.components.CategoryItem
 import com.example.queuesense.ui.components.QueueCard
+import com.example.queuesense.ui.components.SearchBar
 
 @Composable
 fun HomeScreen(
@@ -28,12 +29,13 @@ fun HomeScreen(
 ) {
     val locations by viewModel.locations.collectAsState()
     var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
 
-    val filteredLocations = remember(locations, selectedCategory) {
-        if (selectedCategory == null) {
-            locations
-        } else {
-            locations.filter { it.category.equals(selectedCategory, ignoreCase = true) }
+    val filteredLocations = remember(locations, selectedCategory, searchQuery) {
+        locations.filter { loc ->
+            val categoryMatch = selectedCategory == null || loc.category.equals(selectedCategory, ignoreCase = true)
+            val searchMatch = searchQuery.isEmpty() || loc.name.contains(searchQuery, ignoreCase = true) || loc.city.contains(searchQuery, ignoreCase = true)
+            categoryMatch && searchMatch
         }
     }
 
@@ -44,18 +46,39 @@ fun HomeScreen(
             .padding(16.dp)
     ) {
         item {
-            Text(
-                text = "QueueSense",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1A1A1A)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "QueueSense",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1A1A1A)
+                    )
+                    Text(
+                        text = "Smart Queue Intelligence",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+                
+                // Secret Seed Button (For Developer Use)
+                IconButton(onClick = { viewModel.seedDatabase() }) {
+                    Icon(Icons.Default.CloudUpload, contentDescription = null, tint = Color.LightGray.copy(alpha = 0.5f))
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = { searchQuery = it }
             )
-            Text(
-                text = "Smart Queue Intelligence",
-                fontSize = 14.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         item {
@@ -91,7 +114,7 @@ fun HomeScreen(
                 CategoryItem(
                     title = "Health",
                     icon = Icons.Default.LocalHospital,
-                    color = if (selectedCategory == "Health") Color(0xFFE91E63) else Color(0xFFE91E63).copy(alpha = 0.6f),
+                    color = if (selectedCategory == "Health") Color(0xFF460319) else Color(0xFFE91E63).copy(alpha = 0.6f),
                     onClick = { selectedCategory = "Health" }
                 )
                 CategoryItem(
@@ -111,7 +134,7 @@ fun HomeScreen(
 
         item {
             Text(
-                text = if (selectedCategory == null) "Nearest Queues" else "$selectedCategory Queues",
+                text = if (searchQuery.isNotEmpty()) "Search Results" else if (selectedCategory == null) "Nearest Queues" else "$selectedCategory Queues",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -135,8 +158,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            if (locations.isEmpty()) "No queues found nearby.\nCheck back later!" 
-                            else "No queues found in this category.",
+                            text = "No queues found matching your criteria.",
                             textAlign = TextAlign.Center,
                             color = Color.Gray,
                             fontSize = 14.sp
